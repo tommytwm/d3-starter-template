@@ -5,7 +5,7 @@ class Barchart {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 1000,
       containerHeight: _config.containerHeight || 500,
-      margin: _config.margin || { top: 20, right: 20, bottom: 30, left: 40 },
+      margin: _config.margin || { top: 40, right: 40, bottom: 40, left: 50 },
     };
     this.data = _data;
     this.initVis();
@@ -70,21 +70,23 @@ class Barchart {
 
     // Render the axes
     vis.xAxisG.call(vis.xAxis);
-    // vis.chart
-    //   .append("text")
-    //   .attr("class", "x-axis label")
-    //   .attr("text-anchor", "end")
-    //   .attr("x", vis.width)
-    //   .attr("y", vis.height)
-    //   .attr("style", "color: black; font-weight: normal;")
-    //   .text("State");
+    vis.chart
+      .append("text")
+      .attr("class", "x-axis label")
+      .attr("text-anchor", "middle")
+      .attr("x", vis.width/2)
+      .attr("y", vis.height + 40)
+      .attr("style", "font-size: 14px; font-weight: normal;")
+      .text("State");
     vis.yAxisG.call(vis.yAxis);
-    // vis.chart
-    //   .append("text")
-    //   .attr("class", "y-axis label")
-    //   .attr("text-anchor", "end")
-    //   .attr("y", vis.height)
-    //   .attr("style", "color: black; font-weight: normal;")
-    //   .text("Percent Drinking (female, binge)");
+    vis.chart
+      .append("text")
+      .attr("class", "y-axis label")
+      .attr("x", -vis.height/2)
+      .attr("y", -35)
+      .attr("transform", "rotate(-90)")
+      .attr("text-anchor", "middle")      
+      .attr("style", "font-size: 14px; font-weight: normal;")
+      .text("Percent Drinking (female, binge)");
   }
 }
