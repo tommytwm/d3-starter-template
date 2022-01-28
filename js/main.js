@@ -26,10 +26,6 @@ d3.csv("data/all_drinking.csv")
 
     // Do any tranformations of the data
     data.forEach((d) => {
-      d.state_name = d.state_name;
-      d.state = d.state;
-      d.sex = d.sex;
-      d.type = d.type;
       d.percent = +d.percent;
     });
 

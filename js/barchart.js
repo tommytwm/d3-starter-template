@@ -55,11 +55,11 @@ class Barchart {
   updateVis() {
     let vis = this;
 
-    vis.xValue = vis.data.map((d) => d.state);
-    vis.yValue = vis.data.map((d) => d.percent);
+    vis.xValue = (d) => d.state;
+    vis.yValue = (d) => d.percent;
 
-    vis.xScale.domain(vis.xValue);
-    vis.yScale.domain([d3.max(vis.yValue), 0]);
+    vis.xScale.domain(vis.data.map((d) => vis.xValue(d)));
+    vis.yScale.domain([d3.max(vis.data, (d) => vis.yValue(d)), 0]);
 
     vis.renderVis();
   }
@@ -67,17 +67,24 @@ class Barchart {
   renderVis() {
     let vis = this;
 
-    // Render the bars
-    vis.chart
-      .selectAll(".bar")
-      .data(vis.data)
+    // New elements
+    let bars = vis.chart.selectAll(".bar").data(vis.data);
+    let barEnter = bars
       .enter()
       .append("rect")
-      .attr("x", (d) => vis.xScale(d.state) + 4)
-      .attr("y", (d) => vis.yScale(d.percent))
-      .attr("width", 10)
-      .attr("height", d => vis.height - vis.yScale(d.percent))
-      .attr("fill", "green");
+      .attr("class", "bar")
+      .attr("fill", "transparent")
+      .attr("stroke", "black");
+    barEnter
+      .merge(bars)
+      .attr("x", (d) => vis.xScale(vis.xValue(d)))
+      .attr("width", vis.xScale.bandwidth())
+      .transition()
+      .duration(500)
+      .delay((d, i) => i * 5)
+      .attr("y", (d) => vis.yScale(vis.yValue(d)))
+      .attr("height", (d) => vis.height - vis.yScale(vis.yValue(d)));
+    bars.exit().remove();
 
     // Render the axes
     vis.xAxisG.call(vis.xAxis);
