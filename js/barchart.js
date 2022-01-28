@@ -57,7 +57,6 @@ class Barchart {
 
     vis.xValue = vis.data.map((d) => d.state);
     vis.yValue = vis.data.map((d) => d.percent);
-    console.log(d3.max(vis.yValue));
 
     vis.xScale.domain(vis.xValue);
     vis.yScale.domain([d3.max(vis.yValue), 0]);
@@ -68,13 +67,25 @@ class Barchart {
   renderVis() {
     let vis = this;
 
+    // Render the bars
+    vis.chart
+      .selectAll(".bar")
+      .data(vis.data)
+      .enter()
+      .append("rect")
+      .attr("x", (d) => vis.xScale(d.state) + 4)
+      .attr("y", (d) => vis.yScale(d.percent))
+      .attr("width", 10)
+      .attr("height", d => vis.height - vis.yScale(d.percent))
+      .attr("fill", "green");
+
     // Render the axes
     vis.xAxisG.call(vis.xAxis);
     vis.chart
       .append("text")
       .attr("class", "x-axis label")
       .attr("text-anchor", "middle")
-      .attr("x", vis.width/2)
+      .attr("x", vis.width / 2)
       .attr("y", vis.height + 40)
       .attr("style", "font-size: 14px; font-weight: normal;")
       .text("State");
@@ -82,10 +93,10 @@ class Barchart {
     vis.chart
       .append("text")
       .attr("class", "y-axis label")
-      .attr("x", -vis.height/2)
+      .attr("x", -vis.height / 2)
       .attr("y", -35)
       .attr("transform", "rotate(-90)")
-      .attr("text-anchor", "middle")      
+      .attr("text-anchor", "middle")
       .attr("style", "font-size: 14px; font-weight: normal;")
       .text("Percent Drinking (female, binge)");
   }
