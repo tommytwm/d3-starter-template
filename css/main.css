@@ -17,3 +17,11 @@
   fill:green;
   opacity:.4;
 }
+
+.bar:hover {
+  stroke: #777;
+}
+
+.bar:active {
+  stroke: #333;
+}

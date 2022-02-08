@@ -1,44 +1,66 @@
+
+// Global objects
+let data, scatterplot, barchart;
+let difficultyFilter = [];
+
+
 /**
- * Load data from CSV file asynchronously and render chart
+ * Load data from CSV file asynchronously and render charts
  */
-d3.csv("data/all_drinking.csv")
-  .then((data) => {
-    // Generate filters from input elements on index.html
-    const getFilters = () => {
-      let s = {
-        sex: "female",
-        type: "any",
-      };
-      $(".btn-group .active input").each(function (d, i) {
-        $(this).hasClass("sex")
-          ? (s.sex = $(this).attr("value"))
-          : (s.type = $(this).attr("value"));
-      });
-
-      return s;
-    };
-
-    // Actually filter the data
-    const filterData = (data) => {
-      let filters = getFilters();
-      return data.filter((d) => d.sex == filters.sex && d.type == filters.type);
-    };
-
-    // Do any tranformations of the data
-    data.forEach((d) => {
-      d.percent = +d.percent;
+d3.csv('data/vancouver_trails.csv')
+  .then(_data => {
+    data = _data;
+    data.forEach(d => {
+      d.time = +d.time;
+      d.distance = +d.distance;
     });
 
-    // Create a new bar chart instance and pass the filtered data to the bar chart class
-    const barchart = new Barchart({ parentElement: "#vis" }, filterData(data));
+    // Initialize scales
+    const colorScale = d3.scaleOrdinal()
+        .range(['#d3eecd', '#7bc77e', '#2a8d46']) // light green to dark green
+        .domain(['Easy','Intermediate','Difficult']);
+    
+    scatterplot = new Scatterplot({ 
+      parentElement: '#scatterplot',
+      colorScale: colorScale
+    }, data);
+    scatterplot.updateVis();
 
-    // Show chart by calling updateVis
+    barchart = new Barchart({
+      parentElement: '#barchart',
+      colorScale: colorScale
+    }, data);
     barchart.updateVis();
-
-    // Update the data passed to the chart whenever you interact with a button
-    $("input").change(() => {
-      barchart.data = filterData(data);
-      barchart.updateVis();
-    });
   })
-  .catch((error) => console.error(error));
+  .catch(error => console.error(error));
+
+
+/**
+ * Use bar chart as filter and update scatter plot accordingly
+ */
+function filterData() {
+  if (difficultyFilter.length == 0) {
+    scatterplot.data = data;
+  } else {
+    scatterplot.data = data.filter(d => difficultyFilter.includes(d.difficulty));
+  }
+  scatterplot.updateVis();
+}
+
+
+/*
+d3.selectAll('.legend-btn').on('click', function() {
+  // Toggle 'inactive' class
+  d3.select(this).classed('inactive', !d3.select(this).classed('inactive'));
+  
+  // Check which categories are active
+  let selectedDifficulty = [];
+  d3.selectAll('.legend-btn:not(.inactive)').each(function() {
+    selectedDifficulty.push(d3.select(this).attr('data-difficulty'));
+  });
+
+  // Filter data accordingly and update vis
+  scatterplot.data = data.filter(d => selectedDifficulty.includes(d.difficulty));
+  scatterplot.updateVis();
+});
+*/
