@@ -1,8 +1,9 @@
 
 // Global objects
 let data, scatterplot, barchart;
-let difficultyFilter = [];
 
+// Initialize dispatcher that is used to orchestrate events
+const dispatcher = d3.dispatch('filterCategories');
 
 /**
  * Load data from CSV file asynchronously and render charts
@@ -29,38 +30,21 @@ d3.csv('data/vancouver_trails.csv')
     barchart = new Barchart({
       parentElement: '#barchart',
       colorScale: colorScale
-    }, data);
+    }, dispatcher, data);
     barchart.updateVis();
   })
   .catch(error => console.error(error));
 
 
 /**
- * Use bar chart as filter and update scatter plot accordingly
+ * Dispatcher waits for 'filterCategory' event
+ * We filter data based on the selected categories and update the scatterplot
  */
-function filterData() {
-  if (difficultyFilter.length == 0) {
+dispatcher.on('filterCategories', selectedCategories => {
+  if (selectedCategories.length == 0) {
     scatterplot.data = data;
   } else {
-    scatterplot.data = data.filter(d => difficultyFilter.includes(d.difficulty));
+    scatterplot.data = data.filter(d => selectedCategories.includes(d.difficulty));
   }
   scatterplot.updateVis();
-}
-
-
-/*
-d3.selectAll('.legend-btn').on('click', function() {
-  // Toggle 'inactive' class
-  d3.select(this).classed('inactive', !d3.select(this).classed('inactive'));
-  
-  // Check which categories are active
-  let selectedDifficulty = [];
-  d3.selectAll('.legend-btn:not(.inactive)').each(function() {
-    selectedDifficulty.push(d3.select(this).attr('data-difficulty'));
-  });
-
-  // Filter data accordingly and update vis
-  scatterplot.data = data.filter(d => selectedDifficulty.includes(d.difficulty));
-  scatterplot.updateVis();
 });
-*/
